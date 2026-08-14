@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0A1522" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>PitchSide — Live Cricket Scorer</title>
+  <link rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%8F%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Manrope:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+
+</head>
+
+<body>
+
+  <div class="ambient-bg" aria-hidden="true">
+    <div class="floodlight fl-left"></div>
+    <div class="floodlight fl-right"></div>
+    <div class="stadium-tier"></div>
+    <div class="turf"></div>
+  </div>
+
+  <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch between light and dark mode"
+    title="Switch theme">
+    <span id="theme-toggle-icon">🌙</span>
+  </button>
+
+  <main class="app">
+
+    <!-- ============ SCREEN 1 : SETUP ============ -->
+    <section id="screen-setup" class="screen center active">
+      <header class="brand">
+        <span class="brand-eyebrow">PitchSide</span>
+        <h1>Live Scorer</h1>
+      </header>
+      <div class="glass-card setup-card">
+        <p class="setup-intro">Set the teams and the format — then we'll toss for it.</p>
+
+        <div class="field">
+          <label for="input-teamA">Team A</label>
+          <input type="text" id="input-teamA" placeholder="e.g. Titans" maxlength="24" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="input-teamB">Team B</label>
+          <input type="text" id="input-teamB" placeholder="e.g. Strikers" maxlength="24" autocomplete="off" />
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="input-overs">Overs</label>
+            <input type="number" id="input-overs" min="1" max="90" value="20" inputmode="numeric" />
+            <div class="quick-row" id="overs-quick">
+              <button type="button" class="quick-chip" data-overs="5">T5</button>
+              <button type="button" class="quick-chip" data-overs="10">10ov</button>
+              <button type="button" class="quick-chip active" data-overs="20">T20</button>
+              <button type="button" class="quick-chip" data-overs="50">ODI</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="input-wickets">Wickets</label>
+            <input type="number" id="input-wickets" min="1" max="10" value="10" inputmode="numeric" />
+            <div class="quick-row" id="wkts-quick">
+              <button type="button" class="quick-chip" data-wkts="5">5</button>
+              <button type="button" class="quick-chip" data-wkts="8">8</button>
+              <button type="button" class="quick-chip active" data-wkts="10">10</button>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-primary" id="btn-to-toss">Continue to Toss →</button>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 2 : TOSS ============ -->
+    <section id="screen-toss" class="screen center">
+      <div class="glass-card toss-card">
+        <h2>The Toss</h2>
+        <p class="toss-sub">Tap to flip the coin and see who calls the shots.</p>
+
+        <div class="coin-stage">
+          <div class="coin" id="coin">
+            <div class="coin-face heads"><span id="coin-heads-label">A</span></div>
+            <div class="coin-face tails"><span id="coin-tails-label">B</span></div>
+          </div>
+        </div>
+
+        <button class="btn-primary" id="btn-flip">Flip the Coin</button>
+
+        <div class="toss-result hidden" id="toss-result">
+          <p id="toss-winner-text"></p>
+          <p class="choice-hint">Bat or bowl first?</p>
+          <div class="choice-buttons">
+            <button type="button" data-choice="bat">🏏 Bat First</button>
+            <button type="button" data-choice="bowl">🎯 Bowl First</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 3 : MATCH ============ -->
+    <section id="screen-match" class="screen">
+      <header class="match-header">
+        <div class="team-pill batting" id="pill-batting">Team A</div>
+        <span class="vs">VS</span>
+        <div class="team-pill" id="pill-bowling">Team B</div>
+      </header>
+
+      <div class="glass-card scoreboard-card">
+        <div class="score-row">
+          <div class="score-main" id="score-main" aria-live="polite">0-0</div>
+          <div class="score-meta">
+            <div><span>Overs</span><strong id="stat-overs">0.0</strong></div>
+            <div><span>Extras</span><strong id="stat-extras">0</strong></div>
+          </div>
+        </div>
+
+        <div class="rate-row">
+          <div class="rate-chip"><span>CRR</span><strong id="stat-crr">0.00</strong></div>
+          <div class="rate-chip" id="rrr-chip" hidden><span>RRR</span><strong id="stat-rrr">0.00</strong></div>
+        </div>
+
+        <p class="target-line" id="target-line" hidden></p>
+
+        <p class="freehit-banner" id="freehit-banner" hidden>⚡ FREE HIT ! ⚡</p>
+
+        <hr />
+
+        <span class="ball-data-label">This Over</span>
+        <div class="ball-chips" id="ball-chips"></div>
+      </div>
+
+      <div class="action-grid" id="action-grid">
+        <button class="action-btn" data-action="dot">DOT</button>
+        <button class="action-btn" data-action="1">1 Run</button>
+        <button class="action-btn" data-action="2">2 Runs</button>
+
+        <button class="action-btn" data-action="3">3 Runs</button>
+        <button class="action-btn boundary4" data-action="4">4 Runs</button>
+        <button class="action-btn boundary6" data-action="6">6 Runs</button>
+
+        <button class="action-btn wicket" data-action="wicket" id="btn-wicket-action">Wicket</button>
+        <button class="action-btn extra" data-action="wide">Wide</button>
+        <button class="action-btn extra" data-action="noball">No Ball</button>
+
+        <button class="action-btn runout" data-action="runout">Run Out</button>
+        <button class="action-btn rtdhurt" data-action="rtdhurt">Rtd Hurt</button>
+        <button class="action-btn scoreboard" data-action="scoreboard">Scoreboard</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ MODAL: sub-run picker (wide / no ball / run out) ============ -->
+  <div class="modal-overlay" id="modal-subrun">
+    <div class="modal-sheet">
+      <div class="modal-head">
+        <h3 id="subrun-title">Runs</h3>
+        <button class="modal-close" id="subrun-close" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-options" id="subrun-options"></div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: scoreboard ============ -->
+  <div class="modal-overlay" id="modal-scoreboard">
+    <div class="modal-sheet">
+      <div class="modal-head">
+        <h3>Scoreboard</h3>
+        <button class="modal-close" id="scoreboard-close" aria-label="Close">✕</button>
+      </div>
+      <div id="scoreboard-body"></div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: innings break ============ -->
+  <div class="modal-overlay" id="modal-inningsbreak">
+    <div class="modal-sheet">
+      <div class="modal-head">
+        <h3>Innings Break</h3>
+      </div>
+      <div class="modal-inline-body" id="inningsbreak-body"></div>
+      <button class="btn-primary" id="btn-start-innings2">Start Innings 2 →</button>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: match result ============ -->
+  <div class="modal-overlay" id="modal-result">
+    <div class="modal-sheet">
+      <div class="confetti-layer" id="confetti-layer"></div>
+      <div class="modal-head">
+        <h3>Match Result</h3>
+      </div>
+      <div class="modal-inline-body" id="result-body"></div>
+      <button class="btn-primary" id="btn-new-match">Start New Match</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>
